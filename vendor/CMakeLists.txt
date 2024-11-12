@@ -1,1 +1,1 @@
-add_subdirectory(llvm/llvm)
+add_subdirectory(llvm-project/llvm)

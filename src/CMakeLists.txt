@@ -1,8 +1,6 @@
 
 add_executable(main main.cpp)
 
-message(${llvm_BINARY_DIR}/include)
-message(${llvm_SOURCE_DIR}/llvm/include)
 target_include_directories(main 
     PUBLIC 
     ${llvm_BINARY_DIR}/include
@@ -18,6 +16,10 @@ target_link_libraries(main
     LLVMSupport 
     LLVMDemangle)
 
+add_executable(
+    lexer 
+    lexer.cpp
+)
 #-I/home/vhe/vscode/Kaleidoscope/build/_deps/llvm-src/llvm/include 
 #-I/home/vhe/vscode/Kaleidoscope/build/_deps/llvm-build/include
 #-I/home/vhe/vscode/Kaleidoscope/build/_deps/llvm-src/llvm/include 

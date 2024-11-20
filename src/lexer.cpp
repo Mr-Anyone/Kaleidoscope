@@ -1,91 +1,139 @@
-#include <iostream> 
-#include <memory> 
+#include <iostream>
+#include <memory>
 
-class BaseNode{
+class BaseNode {
 public:
-    BaseNode() {}
-    virtual int evaluate(){
-        std::cout <<"this should not have been called!" << std::endl;
-        return -1;
-    };
-}; 
-
-class ValueExpr: public BaseNode{
-    int value; 
-public:
-    int evaluate() override{
-        return value;
-    }
+  BaseNode() {}
+  virtual int evaluate() {
+    std::cout << "this should not have been called!" << std::endl;
+    return -1;
+  };
 };
 
-class BinExpr: public BaseNode{
+class ValueExpr : public BaseNode {
+  int value;
 
-    std::unique_ptr<ValueExpr> LHS, RHS;
 public:
-    int evaluate() override{
-        return 0;
-    }
+  int evaluate() override { return value; }
 };
 
-std::unique_ptr<BaseNode> LogError(const char* msg){
-    std::cout << msg << std::endl; 
-    return std::make_unique<BaseNode>();
+class BinExpr : public BaseNode {
+
+  std::unique_ptr<ValueExpr> LHS, RHS;
+
+public:
+  int evaluate() override { return 0; }
+};
+
+std::unique_ptr<BaseNode> LogError(const char *msg) {
+  std::cout << msg << std::endl;
+  return std::make_unique<BaseNode>();
 }
 
-std::unique_ptr<BaseNode> makeTree(){ 
-    return std::make_unique<BaseNode>();
-}
+std::unique_ptr<BaseNode> makeTree() { return std::make_unique<BaseNode>(); }
 
-enum Token{
-    BINARY_OP, 
-    NUMERICAL, 
-    EOF
-}; 
+enum Token { BINARY_OP, NUMERICAL, END_OF_FILE };
 
-struct TokenizerData
-{
-    Token token;
-    int value; // if it has one!
+struct TokenizerData {
+  Token token;
+  int value; // if it has one!
 };
 
-class Tokenizer{
+std::ostream &operator<<(std::ostream &stream, const TokenizerData &data) {
+  std::string token_string;
+  switch (data.token) {
+  case Token::BINARY_OP:
+    token_string = "Binary Op";
+    break;
+  case Token::NUMERICAL:
+    token_string = "Numerical";
+    break;
+  case Token::END_OF_FILE:
+    token_string = "End of File";
+    break;
+  default:
+    token_string = "unknown string";
+    break;
+  }
+  stream << "value:" << data.value << ", token: " << token_string;
+  return stream;
+}
+
+class Tokenizer {
 public:
-    Tokenizer(const std::string& expression)
-        :m_parse_string(expression), atIndex (0)
-    {
-        
-    } 
+  Tokenizer(const std::string &expression)
+      : m_parse_string(expression), atIndex(0) {}
 
-  
-    
-    Token getNextToken()
-    {
-        // getting the next token
-        std::string current_symbol = "";
-        // TODO: convert this into stream instead
-        while(m_parse_string.size() < atIndex && m_parse_string[atIndex] != ''){
-            current_symbol += m_parse_string + m_parse_string[atIndex];
-            ++atIndex;
-        }
+  TokenizerData getNextToken() {
+    // ignore white space
+    consumeWhiteSpace();
 
-
-        return Token::BINARY_OP;
+    if (atIndex >= m_parse_string.size()) {
+      return {Token::END_OF_FILE, -1};
     }
 
-    int getValue();
+    // getting the next token
+    std::string current_symbol = "";
+    bool isNumerical = true;
+    while (atIndex < m_parse_string.size() && m_parse_string[atIndex] != ' ') {
+      char currentChar = m_parse_string[atIndex];
+      if (!isalnum(currentChar)) {
+        isNumerical = false;
+      }
+
+      current_symbol += currentChar;
+      ++atIndex;
+    }
+
+    if (isNumerical) {
+      int data = std::stoi(current_symbol);
+      return {Token::NUMERICAL, data};
+    } else {
+      return {Token::BINARY_OP, -1};
+    }
+  }
+
 private:
-    void consumeWhiteSpace(){
-
+  void consumeWhiteSpace() {
+    while (m_parse_string[atIndex] == ' ' && atIndex < m_parse_string.size()) {
+      ++atIndex;
     }
-    
-    std::string m_parse_string;
-    int atIndex;
+  }
+
+  std::string m_parse_string;
+  int atIndex;
 };
 
-int main(){
-    std::string expression = "12 + 12*13*14 + 15";
-    int expected_answer = 2211;
+int main() {
+  std::string expression = "12 + 12 * 13 * 14 + 15";
+  std::cout << expression << std::endl;
+  Tokenizer tokenizer(expression);
 
-    std::cout << "Hello World" << std::endl; 
-    return 0;
+  TokenizerData nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+  nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+  nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+  nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+  nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+  nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+  nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+  nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+  nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+  nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+  nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+  nextToken = tokenizer.getNextToken();
+  std::cout << nextToken << std::endl;
+
+  std::cout << "The program has ended" << std::endl;
+  return 0;
 }
